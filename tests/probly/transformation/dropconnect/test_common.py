@@ -1,34 +1,28 @@
 """Tests for probly.transformation.dropconnect.common."""
+from unittest.mock import MagicMock
 
 import pytest
 from probly.transformation.dropconnect import common
 
-class DummyTraverser:
-    """A dummy traverser for testing registration."""
-    def __init__(self):
-        self.called = False
-
-    def __call__(self, *args, **kwargs):
-        self.called = True
-
-def test_register_adds_class_to_traverser():
+def test_register_adds_class_to_traverser(monkeypatch):
     """Test that register() correctly adds a class to the dropconnect traverser."""
     dummy_class = type("DummyLayer", (), {})
-    dummy_traverser = DummyTraverser()
+    mock_traverser = MagicMock()
+    monkeypatch.setattr(common, "dropconnect_traverser", mock_traverser)
 
-    # Before registration
-    assert dummy_class not in common.dropconnect_traverser._registry
+    # use register
+    common.register(dummy_class, "dummy_traverser")
 
-    # Perform registration
-    common.register(dummy_class, dummy_traverser)
+    #confirm dropconnect_traverser.register used
+    mock_traverser.register.assert_called_once()
 
-    # After registration
-    assert dummy_class in common.dropconnect_traverser._registry, "Class should be registered"
-    entry = common.dropconnect_traverser._registry[dummy_class]
-
-    # Check that skip condition and variable are set correctly
-    assert entry.vars.get("p") == common.P, "DropConnect probability variable not registered"
-    assert callable(entry.skip_if), "skip_if must be a callable"
+    #check all
+    args, kwargs = mock_traverser.register.call_args
+    assert kwargs["cls"] == dummy_class
+    assert "traverser" in kwargs
+    assert "skip_if" in kwargs
+    assert "vars" in kwargs
+    assert kwargs["vars"]["p"] == common.P
 
 #Check that register() correctly registers the class to dropconnect_traverser
 
@@ -40,7 +34,7 @@ def test_dropconnect_function_runs(monkeypatch):
     def mock_traverse(base, compose_fn, init):
         called["traverse"] = True
         assert init[common.P] == 0.25
-        assert init["CLONE"] is True, "CLONE flag must be True"  # just ensure CLONE=True passes
+        assert init[common.CLONE] is True, "CLONE flag must be True"  # just ensure CLONE=True passes
         return "mock_result"
 
     monkeypatch.setattr(common, "traverse", mock_traverse)
