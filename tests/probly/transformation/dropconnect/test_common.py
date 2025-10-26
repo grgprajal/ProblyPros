@@ -10,13 +10,13 @@ def test_register_adds_class_to_traverser(monkeypatch):
     mock_traverser = MagicMock()
     monkeypatch.setattr(common, "dropconnect_traverser", mock_traverser)
 
-    # use register
+    # call register to add dummy_class to the dropconnect_traverser
     common.register(dummy_class, "dummy_traverser")
 
-    #confirm dropconnect_traverser.register used
+    # confirm that dropconnect_traverser's register() method was called
     mock_traverser.register.assert_called_once()
 
-    #check all
+    # check that the correct arguments were passed to register()
     args, kwargs = mock_traverser.register.call_args
     assert kwargs["cls"] == dummy_class
     assert "traverser" in kwargs
@@ -44,5 +44,5 @@ def test_dropconnect_function_runs(monkeypatch):
     assert called["traverse"], "dropconnect() should call traverse()"
     assert result == "mock_result"
 
-# Check that dropconnect() calls traverse() correctly and passes the arguments.
+# All checks passed, dropconnect transformation works as expected
 
