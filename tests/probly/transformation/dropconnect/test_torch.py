@@ -13,14 +13,14 @@ from probly.layers.torch import DropConnectLinear
 from probly.transformation.dropconnect import torch as dc_torch
 
 # fixPathProblem
-ROOT_DIR = Path(__file__).parent.parent.parent.parent.parent.resolve()
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 
 @pytest.fixture
-def simple_model():
+def simple_model() -> nn.Sequential:
     """A simple test model with two Linear Layers."""
     return nn.Sequential(
         nn.Linear(4, 8),
@@ -41,9 +41,9 @@ def test_replace_torch_dropconnect_returns_correct_type() -> None:
 
 def test_register_torch_linear(monkeypatch) -> None:
     """Test that nn.Linear is registered with dropconnect_traverser."""
-    registered = []
+    registered: list[tuple[type, object]] = []
 
-    def mock_register(cls, traverser) -> None:
+    def mock_register(cls: type, traverser: object) -> None:
         registered.append((cls, traverser))
 
     common = importlib.import_module("probly.transformation.dropconnect.common")
