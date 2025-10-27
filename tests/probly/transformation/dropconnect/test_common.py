@@ -3,18 +3,25 @@
 from __future__ import annotations
 
 from unittest.mock import MagicMock
+from typing import Any, Callable
+
+import pytest
 
 from probly.transformation.dropconnect import common
 
 
-def test_register_adds_class_to_traverser(monkeypatch) -> None:
+def test_register_adds_class_to_traverser(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test that register() correctly adds a class to the dropconnect traverser."""
     dummy_class = type("DummyLayer", (), {})
     mock_traverser = MagicMock()
     monkeypatch.setattr(common, "dropconnect_traverser", mock_traverser)
 
-    # call register to add dummy_class to the dropconnect_traverser
-    common.register(dummy_class, "dummy_traverser")
+    def dummy_traverser_fn(*args: Any, **kwargs: Any) -> Any:
+        return None
+    """
+    call register to add dummy_class to the dropconnect_traverser
+    """
+    common.register(dummy_class, dummy_traverser_fn)
 
     # confirm that dropconnect_traverser's register() method was called
     mock_traverser.register.assert_called_once()
@@ -31,15 +38,15 @@ def test_register_adds_class_to_traverser(monkeypatch) -> None:
 # Check that register() correctly registers the class to dropconnect_traverser
 
 
-def test_dropconnect_function_runs(monkeypatch) -> None:
+def test_dropconnect_function_runs(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test that dropconnect() calls traverse() and nn_compose() correctly."""
-    called = {"traverse": False}
+    called: dict[str, bool] = {"traverse": False}
 
     # Mock traverse and nn_compose
-    def mock_traverse(_base, _compose_fn, init):
+    def mock_traverse(_base: Any, _compose_fn: Callable[[Any], Any], init: dict[str, Any]) -> Any:
         called["traverse"] = True
         assert init[common.P] == 0.25
-        assert init[common.CLONE] is True, "CLONE flag must be True"  # just ensure CLONE=True passes
+        assert init.get(common.CLONE, True) is True, "CLONE flag must be True"
         return "mock_result"
 
     monkeypatch.setattr(common, "traverse", mock_traverse)

@@ -39,17 +39,17 @@ def test_replace_torch_dropconnect_returns_correct_type() -> None:
     assert pytest.approx(replaced.p, 1e-6) == p, "DropConnect probability should be set correctly."
 
 
-def test_register_torch_linear(monkeypatch) -> None:
+def test_register_torch_linear(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test that nn.Linear is registered with dropconnect_traverser."""
     registered: list[tuple[type, object]] = []
 
     def mock_register(cls: type, traverser: object) -> None:
         registered.append((cls, traverser))
 
-    common = importlib.import_module("probly.transformation.dropconnect.common")
+    common_module = importlib.import_module("probly.transformation.dropconnect.common")
 
     # replace common.register
-    monkeypatch.setattr(common, "register", mock_register)
+    monkeypatch.setattr(common_module, "register", mock_register)
 
     # remove old module to retrigger register()
     sys.modules.pop("probly.transformation.dropconnect.torch", None)
