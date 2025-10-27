@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from unittest.mock import MagicMock
-from typing import Any, Callable
+from typing import Callable
 
 import pytest
 
@@ -16,11 +16,9 @@ def test_register_adds_class_to_traverser(monkeypatch: pytest.MonkeyPatch) -> No
     mock_traverser = MagicMock()
     monkeypatch.setattr(common, "dropconnect_traverser", mock_traverser)
 
-    def dummy_traverser_fn(*args: Any, **kwargs: Any) -> Any:
-        return None
-    """
-    call register to add dummy_class to the dropconnect_traverser
-    """
+    def dummy_traverser_fn(*_: object, **__: object) -> None:
+        pass
+
     common.register(dummy_class, dummy_traverser_fn)
 
     # confirm that dropconnect_traverser's register() method was called
@@ -43,10 +41,12 @@ def test_dropconnect_function_runs(monkeypatch: pytest.MonkeyPatch) -> None:
     called: dict[str, bool] = {"traverse": False}
 
     # Mock traverse and nn_compose
-    def mock_traverse(_base: Any, _compose_fn: Callable[[Any], Any], init: dict[str, Any]) -> Any:
+    def mock_traverse(
+        _base: object, _compose_fn: Callable[[object], object], init: dict[str, object]
+    ) -> object:
         called["traverse"] = True
         assert init[common.P] == 0.25
-        assert init.get(common.CLONE, True) is True, "CLONE flag must be True"
+        assert init.get(common.CLONE, True) is True
         return "mock_result"
 
     monkeypatch.setattr(common, "traverse", mock_traverse)
