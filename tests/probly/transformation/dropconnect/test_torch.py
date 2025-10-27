@@ -1,4 +1,6 @@
 """Tests for probly.transformation.dropconnect.torch."""
+import importlib
+from xml.dom.domreg import registered
 
 import pytest
 import torch
@@ -28,4 +30,16 @@ def test_replace_torch_dropconnect_returns_correct_type():
     assert pytest.approx(replaced.p, 1e-6) == p, """DropConnect probability should be set correctly."""
 
 """tests/probly/transformation/dropconnect/test_torch.py::test_replace_torch_dropconnect_returns_correct_type PASSED          [100%]"""
+
+def test_register_torch_linear(monkeypatch):
+    """Test that nn.Linear is registered with dropconnect_traverser."""
+    registered = []
+    def mock_register(cls, traverser):
+        registered.append((cls, traverser))
+
+    monkeypatch.setattr(dc_torch, "register", mock_register)
+
+    importlib.reload(dc_torch) # triggers the register call at module import time.
+
+    assert any(cls == nn.Linear for cls, _ in registered), """nn.Linear should be registered."""
 
