@@ -2,20 +2,21 @@
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock
 from typing import Callable
+from unittest.mock import MagicMock
+import pytest
 
 from probly.transformation.dropconnect import common
 
 
-def test_register_adds_class_to_traverser(monkeypatch) -> None:
+def test_register_adds_class_to_traverser(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test that register() correctly adds a class to the dropconnect traverser."""
     dummy_class = type("DummyLayer", (), {})
     mock_traverser = MagicMock()
     monkeypatch.setattr(common, "dropconnect_traverser", mock_traverser)
 
     # call register to add dummy_class to the dropconnect_traverser
-    common.register(dummy_class, "dummy_traverser")  # type: ignore[arg-type]
+    common.register(dummy_class, lambda *a, **k: None)
 
     # confirm that dropconnect_traverser's register() method was called
     mock_traverser.register.assert_called_once()
@@ -26,10 +27,14 @@ def test_register_adds_class_to_traverser(monkeypatch) -> None:
     assert "traverser" in kwargs
     assert "skip_if" in kwargs
     assert "vars" in kwargs
-    assert kwargs["vars"]["p"] == common.P
+
+    vars_dict = kwargs["vars"]
+
+    assert "p" in vars_dict
+    assert vars_dict["p"] == common.P
 
 
-def test_dropconnect_function_runs(monkeypatch) -> None:
+def test_dropconnect_function_runs(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test that dropconnect() calls traverse() and nn_compose() correctly."""
     called = {"traverse": False}
 
@@ -37,16 +42,18 @@ def test_dropconnect_function_runs(monkeypatch) -> None:
     def mock_traverse(
         _base: object,
         _compose_fn: Callable[[object], object],
-        init: dict[str, object],
+        init: dict[object, object],
     ) -> object:
         called["traverse"] = True
+        assert common.P in init
+        assert common.CLONE in init
         assert init[common.P] == 0.25
-        assert init[common.CLONE] is True, "CLONE flag must be True"
+        assert init[common.CLONE] is True
         return "mock_result"
 
     monkeypatch.setattr(common, "traverse", mock_traverse)
     monkeypatch.setattr(common, "nn_compose", lambda x: x)
 
-    result = common.dropconnect("dummy_model", p=0.25)
+    result = common.dropconnect("dummy_model", p=0.25)  # type: ignore
     assert called["traverse"], "dropconnect() should call traverse()"
     assert result == "mock_result"
