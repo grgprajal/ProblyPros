@@ -1,11 +1,14 @@
 """Simple test for torch dropconnect functionality."""
 
+from __future__ import annotations
+
 import torch
-import torch.nn as nn
+from torch import nn
+
 from probly.transformation.dropconnect import dropconnect
 
 
-def test_dropconnect_torch():
+def test_dropconnect_torch() -> None:
     """Test that dropconnect works with PyTorch models."""
     # Create a simple PyTorch model
     model = nn.Linear(10, 2)
