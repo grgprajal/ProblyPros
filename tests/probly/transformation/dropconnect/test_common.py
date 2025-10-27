@@ -5,21 +5,17 @@ from __future__ import annotations
 from unittest.mock import MagicMock
 from typing import Callable
 
-import pytest
-
 from probly.transformation.dropconnect import common
 
 
-def test_register_adds_class_to_traverser(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_register_adds_class_to_traverser(monkeypatch) -> None:
     """Test that register() correctly adds a class to the dropconnect traverser."""
     dummy_class = type("DummyLayer", (), {})
     mock_traverser = MagicMock()
     monkeypatch.setattr(common, "dropconnect_traverser", mock_traverser)
 
-    def dummy_traverser_fn(*_: object, **__: object) -> None:
-        pass
-
-    common.register(dummy_class, dummy_traverser_fn)
+    # call register to add dummy_class to the dropconnect_traverser
+    common.register(dummy_class, "dummy_traverser")  # type: ignore[arg-type]
 
     # confirm that dropconnect_traverser's register() method was called
     mock_traverser.register.assert_called_once()
@@ -33,20 +29,19 @@ def test_register_adds_class_to_traverser(monkeypatch: pytest.MonkeyPatch) -> No
     assert kwargs["vars"]["p"] == common.P
 
 
-# Check that register() correctly registers the class to dropconnect_traverser
-
-
-def test_dropconnect_function_runs(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_dropconnect_function_runs(monkeypatch) -> None:
     """Test that dropconnect() calls traverse() and nn_compose() correctly."""
-    called: dict[str, bool] = {"traverse": False}
+    called = {"traverse": False}
 
     # Mock traverse and nn_compose
     def mock_traverse(
-        _base: object, _compose_fn: Callable[[object], object], init: dict[str, object]
+        _base: object,
+        _compose_fn: Callable[[object], object],
+        init: dict[str, object],
     ) -> object:
         called["traverse"] = True
         assert init[common.P] == 0.25
-        assert init.get(common.CLONE, True) is True
+        assert init[common.CLONE] is True, "CLONE flag must be True"
         return "mock_result"
 
     monkeypatch.setattr(common, "traverse", mock_traverse)

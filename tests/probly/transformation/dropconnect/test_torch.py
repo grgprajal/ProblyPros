@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import importlib
-from pathlib import Path
 import sys
+from pathlib import Path
+from typing import List, Tuple
 
 import pytest
 from torch import nn
@@ -14,7 +15,6 @@ from probly.transformation.dropconnect import torch as dc_torch
 
 # fixPathProblem
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent
-
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
@@ -39,17 +39,17 @@ def test_replace_torch_dropconnect_returns_correct_type() -> None:
     assert pytest.approx(replaced.p, 1e-6) == p, "DropConnect probability should be set correctly."
 
 
-def test_register_torch_linear(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_register_torch_linear(monkeypatch) -> None:
     """Test that nn.Linear is registered with dropconnect_traverser."""
-    registered: list[tuple[type, object]] = []
+    registered: List[Tuple[type, object]] = []
 
     def mock_register(cls: type, traverser: object) -> None:
         registered.append((cls, traverser))
 
-    common_module = importlib.import_module("probly.transformation.dropconnect.common")
+    common = importlib.import_module("probly.transformation.dropconnect.common")
 
     # replace common.register
-    monkeypatch.setattr(common_module, "register", mock_register)
+    monkeypatch.setattr(common, "register", mock_register)
 
     # remove old module to retrigger register()
     sys.modules.pop("probly.transformation.dropconnect.torch", None)
