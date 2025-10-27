@@ -31,7 +31,7 @@ def test_dropconnect_function_runs(monkeypatch):
     called = {"traverse": False}
 
     # Mock traverse and nn_compose
-    def mock_traverse(base, compose_fn, init):
+    def mock_traverse(_base, _compose_fn, init):
         called["traverse"] = True
         assert init[common.P] == 0.25
         assert init[common.CLONE] is True, "CLONE flag must be True"  # just ensure CLONE=True passes

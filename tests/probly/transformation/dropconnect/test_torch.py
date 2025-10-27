@@ -2,18 +2,18 @@
 import os
 import sys
 import importlib
+from pathlib import Path
+from probly.transformation.dropconnect import torch as dc_torch
+from probly.layers.torch import DropConnectLinear
 
 import pytest
 import torch
 from torch import nn
 
 # fixPathProblem
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../.."))
+ROOT_DIR = Path.resolve(Path/Path.parent__file__, "../../../../..")
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
-
-from probly.transformation.dropconnect import torch as dc_torch
-from probly.layers.torch import DropConnectLinear
 
 
 @pytest.fixture
@@ -43,7 +43,6 @@ def test_register_torch_linear(monkeypatch):
     def mock_register(cls, traverser):
         registered.append((cls, traverser))
 
-    # importCommonModule
     common = importlib.import_module("probly.transformation.dropconnect.common")
 
     # replace common.register
