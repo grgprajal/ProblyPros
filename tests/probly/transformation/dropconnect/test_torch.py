@@ -67,4 +67,4 @@ def test_register_torch_linear(monkeypatch):
     """
 
     # all tests passed, final version
-    # test for push up
+    # test for push
