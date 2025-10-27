@@ -57,14 +57,5 @@ def test_register_torch_linear(monkeypatch):
     assert any(cls == nn.Linear for cls, _ in registered), "nn.Linear should be registered."
 
 
-    """
-        tests/probly/transformation/dropconnect/test_common.py::test_register_adds_class_to_traverser PASSED                       [ 25%]
-        tests/probly/transformation/dropconnect/test_common.py::test_dropconnect_function_runs PASSED                              [ 50%]
-        tests/probly/transformation/dropconnect/test_torch.py::test_replace_torch_dropconnect_returns_correct_type PASSED          [ 75%]
-        tests/probly/transformation/dropconnect/test_torch.py::test_register_torch_linear PASSED                                   [100%]
-
-        ======================================================= 4 passed in 0.01s ========================================================
-    """
-
     # all tests passed, final version
     # test for push
