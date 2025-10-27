@@ -12,7 +12,7 @@ def test_dropconnect_common() -> None:
     # Test that function exists and is callable
     assert callable(dropconnect)
 
-    # Test with mock model
+    # Test with mock Model
     mock_model = Mock()
     result = dropconnect(mock_model, p=0.5)
 
