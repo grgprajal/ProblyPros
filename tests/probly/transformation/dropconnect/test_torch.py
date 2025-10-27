@@ -1,14 +1,16 @@
 """Tests for probly.transformation.dropconnect.torch."""
-import os
-import sys
+
+from __future__ import annotations
+
 import importlib
 from pathlib import Path
-from probly.transformation.dropconnect import torch as dc_torch
-from probly.layers.torch import DropConnectLinear
+import sys
 
 import pytest
-import torch
 from torch import nn
+
+from probly.layers.torch import DropConnectLinear
+from probly.transformation.dropconnect import torch as dc_torch
 
 # fixPathProblem
 ROOT_DIR = (Path(__file__).parent.parent.parent.parent.parent).resolve()
@@ -55,7 +57,6 @@ def test_register_torch_linear(monkeypatch):
 
     # Check whether nn.Linear is registered successfully
     assert any(cls == nn.Linear for cls, _ in registered), "nn.Linear should be registered."
-
 
     # all tests passed, final version
     # test for push

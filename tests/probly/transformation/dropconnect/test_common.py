@@ -1,8 +1,11 @@
 """Tests for probly.transformation.dropconnect.common."""
+
+from __future__ import annotations
+
 from unittest.mock import MagicMock
 
-import pytest
 from probly.transformation.dropconnect import common
+
 
 def test_register_adds_class_to_traverser(monkeypatch):
     """Test that register() correctly adds a class to the dropconnect traverser."""
@@ -24,7 +27,9 @@ def test_register_adds_class_to_traverser(monkeypatch):
     assert "vars" in kwargs
     assert kwargs["vars"]["p"] == common.P
 
-#Check that register() correctly registers the class to dropconnect_traverser
+
+# Check that register() correctly registers the class to dropconnect_traverser
+
 
 def test_dropconnect_function_runs(monkeypatch):
     """Test that dropconnect() calls traverse() and nn_compose() correctly."""
@@ -44,5 +49,5 @@ def test_dropconnect_function_runs(monkeypatch):
     assert called["traverse"], "dropconnect() should call traverse()"
     assert result == "mock_result"
 
-# All checks passed, dropconnect transformation works as expected
 
+# All checks passed, dropconnect transformation works as expected
