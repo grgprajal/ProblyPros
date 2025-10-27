@@ -7,7 +7,7 @@ from unittest.mock import MagicMock
 from probly.transformation.dropconnect import common
 
 
-def test_register_adds_class_to_traverser(monkeypatch):
+def test_register_adds_class_to_traverser(monkeypatch) -> None:
     """Test that register() correctly adds a class to the dropconnect traverser."""
     dummy_class = type("DummyLayer", (), {})
     mock_traverser = MagicMock()
@@ -31,7 +31,7 @@ def test_register_adds_class_to_traverser(monkeypatch):
 # Check that register() correctly registers the class to dropconnect_traverser
 
 
-def test_dropconnect_function_runs(monkeypatch):
+def test_dropconnect_function_runs(monkeypatch) -> None:
     """Test that dropconnect() calls traverse() and nn_compose() correctly."""
     called = {"traverse": False}
 
@@ -48,6 +48,3 @@ def test_dropconnect_function_runs(monkeypatch):
     result = common.dropconnect("dummy_model", p=0.25)
     assert called["traverse"], "dropconnect() should call traverse()"
     assert result == "mock_result"
-
-
-# All checks passed, dropconnect transformation works as expected
